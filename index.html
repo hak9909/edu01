@@ -58,9 +58,56 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-blur: 5px;
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 85%;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 110;
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+
+    <!-- Popups -->
+    <div id="imageModal" class="modal" onclick="closeModal('imageModal')">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content rounded-xl shadow-2xl" id="modalImg" src="dokdo_info.png" alt="독도 인포그래픽" onclick="event.stopPropagation()">
+    </div>
+
+    <div id="videoModal" class="modal" onclick="closeModal('videoModal')">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content w-full max-w-4xl aspect-video" onclick="event.stopPropagation()">
+            <video id="modalVideo" class="w-full h-full rounded-xl shadow-2xl" controls>
+                <source src="dokdo_mp4_1.mp4" type="video/mp4">
+                사용자의 브라우저가 비디오 태그를 지원하지 않습니다.
+            </video>
+        </div>
+    </div>
 
     <!-- Navigation -->
     <nav class="fixed w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-blue-100 dark:border-slate-800">
@@ -99,16 +146,32 @@
                 우리 영토의 동쪽 끝에서 가장 먼저 태양을 맞이하는 섬, 독도.<br class="hidden md:block">
                 독도의 지리적 가치와 역사적 진실을 탐구하며 명백한 우리 땅임을 논리적으로 이해해 봅니다.
             </p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="#info" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-all transform hover:scale-105">
-                    보고서 읽기
-                </a>
-                <a href="./01/index.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105">
-                    독도 연표
-                </a>
-                <a href="./02/02.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105">
-                    독도 용어
-                </a>
+            
+            <!-- Button Group -->
+            <div class="flex flex-col items-center gap-6">
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#info" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-all transform hover:scale-105">
+                        보고서 읽기
+                    </a>
+                    <a href="./01/index.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105">
+                        독도 연표
+                    </a>
+                    <a href="./02/02.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105">
+                        독도 용어
+                    </a>
+                </div>
+                
+                <!-- New Media Buttons -->
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="openModal('imageModal')" class="flex items-center space-x-2 bg-emerald-600/80 hover:bg-emerald-500 backdrop-blur-sm text-white px-6 py-2.5 rounded-xl font-medium shadow-lg transition-all transform hover:scale-105">
+                        <i class="fas fa-image"></i>
+                        <span>인포그래픽 보기</span>
+                    </button>
+                    <button onclick="openModal('videoModal')" class="flex items-center space-x-2 bg-rose-600/80 hover:bg-rose-500 backdrop-blur-sm text-white px-6 py-2.5 rounded-xl font-medium shadow-lg transition-all transform hover:scale-105">
+                        <i class="fas fa-play-circle"></i>
+                        <span>동영상 보기</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -324,6 +387,33 @@
     </footer>
 
     <script>
+        // --- Modal Logic ---
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+            document.body.style.overflow = "hidden"; // Scroll Lock
+            if(id === 'videoModal') {
+                document.getElementById('modalVideo').play();
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+            document.body.style.overflow = "auto"; // Scroll Unlock
+            if(id === 'videoModal') {
+                const video = document.getElementById('modalVideo');
+                video.pause();
+                video.currentTime = 0;
+            }
+        }
+
+        // Close modal on Esc key
+        window.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') {
+                closeModal('imageModal');
+                closeModal('videoModal');
+            }
+        });
+
         // --- Theme Toggle Logic ---
         const themeBtn = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
